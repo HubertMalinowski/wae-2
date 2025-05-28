@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from src.evolution import evolutionary_strategy, toolbox
-from src.functions import rosenbrock_dynamic
+from evolution import evolutionary_strategy, toolbox
+from functions import rosenbrock_dynamic
 
 def run_experiment(func, generations=100, num_runs=30):
     results = []
