@@ -1,0 +1,5 @@
+Statistics for Noisy_Quadratic:
+Average final fitness: -0.050289 ± 0.095938
+Best fitness found: -0.224836
+Worst fitness found: 0.143209
+Median fitness: -0.052605

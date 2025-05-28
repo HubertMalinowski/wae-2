@@ -1,0 +1,5 @@
+Statistics for Dynamic_Rosenbrock:
+Average final fitness: 0.438657 ± 0.341032
+Best fitness found: 0.035875
+Worst fitness found: 1.445413
+Median fitness: 0.324735

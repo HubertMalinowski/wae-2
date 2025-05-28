@@ -1,0 +1,5 @@
+Statistics for Dynamic_Rastrigin:
+Average final fitness: 1.938983 ± 1.036729
+Best fitness found: 0.432395
+Worst fitness found: 5.019425
+Median fitness: 1.668880

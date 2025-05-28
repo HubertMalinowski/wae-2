@@ -1,5 +1,11 @@
 import random
+import numpy as np
 from deap import base, creator, tools
+
+# Set fixed random seed for reproducibility
+RANDOM_SEED = 42
+random.seed(RANDOM_SEED)
+np.random.seed(RANDOM_SEED)
 
 # Ustalenie typu optymalizacji
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -15,27 +21,40 @@ toolbox.register("individual", tools.initIterate, creator.Individual, create_ind
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 # Funkcja ewolucji różnicowej DE/rand/1/bin
-def differential_evolution(individual, toolbox, mu=0.5, F=0.8):
-    # Tworzenie populacji za pomocą toolbox
-    population = list(toolbox.population(n=3))  # Upewnij się, że generujesz populację
-    a, b, c = random.sample(population, 3)  # Wybór 3 losowych osobników
+def differential_evolution(individual, population, mu=0.5, F=0.8):
+    # Wybór 3 losowych osobników z populacji (bez siebie samego)
+    a, b, c = random.sample([ind for ind in population if ind != individual], 3)
     mutant = [a[i] + F * (b[i] - c[i]) for i in range(len(individual))]
     
-    # Utworzenie nowego osobnika jako instancji creator.Individual, aby miał atrybut fitness
-    child = creator.Individual([mutant[i] if random.random() < mu else individual[i] for i in range(len(individual))])
-    
+    # Krzyżowanie binarne
+    child = creator.Individual([
+        mutant[i] if random.random() < mu else individual[i]
+        for i in range(len(individual))
+    ])
     return child
 
 # Funkcja strategii ewolucyjnej (µ, λ)
-def evolutionary_strategy(mu=10, lambda_=50, generations=100):
-    # Inicjalizacja populacji
+def evolutionary_strategy(func, t, mu=10, lambda_=50, generations=1):
     population = toolbox.population(n=mu)
-    
-    # Ewolucja przez µ, λ strategię
-    for gen in range(generations):
-        offspring = list(map(lambda ind: differential_evolution(ind, toolbox), population))
+
+    # Ewaluacja startowa
+    for ind in population:
+        if t is not None:  # Time-dependent function
+            ind.fitness.values = func(ind, t)
+        else:  # Time-independent function
+            ind.fitness.values = func(ind)
+
+    for _ in range(generations):
+        offspring = []
+        for ind in population:
+            child = differential_evolution(ind, population)
+            if t is not None:  # Time-dependent function
+                child.fitness.values = func(child, t)
+            else:  # Time-independent function
+                child.fitness.values = func(child)
+            offspring.append(child)
         
-        # Selekcja najlepszych λ osobników
-        population = sorted(offspring, key=lambda x: x.fitness.values)[:mu]
-    
+        # Selekcja najlepszych
+        population = sorted(offspring, key=lambda x: x.fitness.values[0])[:mu]
+
     return population
