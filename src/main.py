@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from optimization import run_experiment
-from functions import rosenbrock_dynamic, rastrigin_dynamic, noisy_quadratic
+from functions import rosenbrock, rastrigin, quadratic
 from visualization import visualize_results
 import os
 from datetime import datetime
@@ -43,9 +43,9 @@ def run_all_experiments():
     num_runs = 30     # number of runs per experiment
     
     test_functions = [
-        ("Dynamic_Rosenbrock", rosenbrock_dynamic),
-        ("Dynamic_Rastrigin", rastrigin_dynamic),
-        ("Noisy_Quadratic", noisy_quadratic)
+        ("Rosenbrock", rosenbrock),
+        ("Rastrigin", rastrigin),
+        ("Quadratic", quadratic)
     ]
     
     for func_name, func in test_functions:
@@ -54,16 +54,20 @@ def run_all_experiments():
         print(f"Using random seed: {RANDOM_SEED}")
         print('='*50)
         
+        # Create a subfolder for this function
+        func_dir = os.path.join(results_dir, func_name)
+        os.makedirs(func_dir, exist_ok=True)
         # Run experiment
         results, stats = run_experiment(
             func, 
             generations=generations, 
             num_runs=num_runs,
-            function_name=func_name
+            function_name=func_name,
+            save_dir=func_dir
         )
         
         # Save results
-        save_results(results, stats, func_name, results_dir)
+        save_results(results, stats, func_name, func_dir)
         
         # Display results
         print(f"\nFinal solutions for {func_name}:")
@@ -71,7 +75,7 @@ def run_all_experiments():
         
         # Visualize and save results
         print(f"\nVisualizing results for {func_name}...")
-        plot_file = os.path.join(results_dir, f"{func_name}_visualization.png")
+        plot_file = os.path.join(func_dir, f"{func_name}_visualization.png")
         visualize_results(results, title=f"Optimization Results - {func_name}", save_path=plot_file)
 
 if __name__ == "__main__":
